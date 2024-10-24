@@ -1,67 +1,109 @@
-import React, { useState } from 'react';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css'; // Carousel styles
+"use client";
+
+import React, { useState, useEffect } from "react";
+import KeenSlider, { KeenSliderInstance } from "keen-slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const gallaryArrowsInit = (slider: KeenSliderInstance) => {
+  const leftArrow = document.getElementById("gallary-left-arrow");
+  const rightArrow = document.getElementById("gallary-right-arrow");
+
+  if (leftArrow) leftArrow.addEventListener("click", () => slider.prev());
+  if (rightArrow) rightArrow.addEventListener("click", () => slider.next());
+};
+
+const addDots = (slider: KeenSliderInstance, wrapperSelector: string) => {
+  const dots = document.createElement("div");
+  dots.className = "dots";
+  const wrapper = document.querySelector(wrapperSelector);
+
+  if (wrapper) {
+    while (wrapper.firstChild) {
+      wrapper.removeChild(wrapper.firstChild);
+    }
+
+    slider.track.details.slides.forEach((_e, idx) => {
+      const dot = document.createElement("div");
+      dot.className = "dot";
+      if (idx === 0) dot.classList.add("dot--active");
+      dot.addEventListener("click", () => slider.moveToIdx(idx));
+      dots.appendChild(dot);
+    });
+
+    const updateClasses = () => {
+      const slide = slider.track.details.rel;
+      Array.from(dots.children).forEach((dot, idx) => {
+        if (dot instanceof HTMLElement) {
+          idx === slide
+            ? dot.classList.add("dot--active")
+            : dot.classList.remove("dot--active");
+        }
+      });
+    };
+
+    wrapper.appendChild(dots);
+
+    slider.on("created", updateClasses);
+    slider.on("optionsChanged", updateClasses);
+    slider.on("slideChanged", updateClasses);
+  }
+};
 
 const TripSummary: React.FC = () => {
-  // State for tab selection
-  const [activeTab, setActiveTab] = useState<'vlogs' | 'gallery'>('vlogs');
-
-  // Dummy vlog data
   const vlogs = [
     {
       id: 1,
-      title: 'Vlog 1',
-      url: 'https://www.youtube.com/embed/your_dummy_video_url1', // Replace with actual URLs
+      title: "Vlog 1",
+      url: "https://www.youtube.com/embed/your_dummy_video_url1",
     },
     {
       id: 2,
-      title: 'Vlog 2',
-      url: 'https://www.youtube.com/embed/your_dummy_video_url2',
+      title: "Vlog 2",
+      url: "https://www.youtube.com/embed/your_dummy_video_url2",
     },
   ];
 
-  // Dummy gallery images
   const galleryImages = [
     {
       id: 1,
-      src: 'https://via.placeholder.com/600x400?text=Image+1', // Replace with actual images
-      alt: 'Trip Image 1',
+      src: "https://via.placeholder.com/600x400?text=Image+1",
+      alt: "Trip Image 1",
     },
     {
       id: 2,
-      src: 'https://via.placeholder.com/600x400?text=Image+2',
-      alt: 'Trip Image 2',
+      src: "https://via.placeholder.com/600x400?text=Image+2",
+      alt: "Trip Image 2",
     },
     {
       id: 3,
-      src: 'https://via.placeholder.com/600x400?text=Image+3',
-      alt: 'Trip Image 3',
+      src: "https://via.placeholder.com/600x400?text=Image+3",
+      alt: "Trip Image 3",
     },
   ];
+
+  useEffect(() => {
+    const gallaryCarousel = new KeenSlider("#gallary-carousel", {
+      loop: true,
+      mode: "snap",
+      rtl: false,
+      slides: { perView: "auto", spacing: 16 },
+    });
+
+    gallaryArrowsInit(gallaryCarousel);
+    addDots(gallaryCarousel, ".gallary-dots-header");
+  }, []);
 
   return (
     <div className="trip-summary">
       <h1>Trip Summary</h1>
-      
-      {/* Tab Navigation */}
-      <div className="tabs">
-        <button
-          className={activeTab === 'vlogs' ? 'active-tab' : ''}
-          onClick={() => setActiveTab('vlogs')}
-        >
-          Vlogs
-        </button>
-        <button
-          className={activeTab === 'gallery' ? 'active-tab' : ''}
-          onClick={() => setActiveTab('gallery')}
-        >
-          Gallery
-        </button>
-      </div>
 
-      {/* Tab Content */}
-      <div className="tab-content">
-        {activeTab === 'vlogs' && (
+      <Tabs defaultValue="vlogs" className="bg-neutral-800">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="vlogs">Vlogs</TabsTrigger>
+          <TabsTrigger value="gallery">Gallery</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="vlogs">
           <div className="vlog-section">
             <h2>Vlogs</h2>
             <div className="vlogs">
@@ -81,21 +123,22 @@ const TripSummary: React.FC = () => {
               ))}
             </div>
           </div>
-        )}
+        </TabsContent>
 
-        {activeTab === 'gallery' && (
+        <TabsContent value="gallery">
           <div className="gallery-section">
             <h2>Gallery</h2>
-            <Carousel showThumbs={false} dynamicHeight>
+            <div id="gallary-carousel" className="keen-slider flex">
               {galleryImages.map((image) => (
-                <div key={image.id}>
+                <div key={image.id} className="keen-slider__slide">
                   <img src={image.src} alt={image.alt} />
                 </div>
               ))}
-            </Carousel>
+            </div>
+            <div className="gallary-dots-header"></div>
           </div>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
 
       <style jsx>{`
         .tabs {
@@ -127,7 +170,7 @@ const TripSummary: React.FC = () => {
         }
 
         .tab-content {
-          min-height: 300px; /* Ensure that tab content area has consistent height */
+          min-height: 300px;
         }
       `}</style>
     </div>
@@ -135,4 +178,6 @@ const TripSummary: React.FC = () => {
 };
 
 export default TripSummary;
+
+
 
