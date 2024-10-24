@@ -7,9 +7,9 @@ export interface ITrip extends Document {
   source: string;
   destination: string;
   genre: string;
-  bus: boolean;
-  train: boolean;
-  plane: boolean;
+  bus: {name: string, price:  number};
+  train: {name: string, price:  number};
+  plane: {name: string, price:  number};
   meal: boolean;
   hotel: boolean;
   blog: string;
@@ -42,16 +42,24 @@ const tripSchema = new Schema<ITrip>({
     required: true
   },
   bus: {
-    type: Boolean,
-    default: false
+    name: {
+      type: String,
+      default: ''
+    },
+    price: {
+      type: Number,
+      default: 0
+    }
   },
   train: {
-    type: Boolean,
-    default: false
-  },
-  plane: {
-    type: Boolean,
-    default: false
+    name: {
+      type: String,
+      default: ''
+    },
+    price: {
+      type: Number,
+      default: 0
+    }
   },
   meal: {
     type: Boolean,

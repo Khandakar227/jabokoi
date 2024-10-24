@@ -28,14 +28,6 @@ const MyPage = () => {
     fetchTrips();
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>; // Display loading state
-  }
-
-  if (trips.length === 0) {
-    return <p>No trips available</p>; // Handle empty trips
-  }
-
   const router = useRouter(); 
   const handleCardClick = (trip: ITrip) => {
     console.log(`Clicked on trip: ${trip.trip_id}`);
@@ -44,11 +36,12 @@ const MyPage = () => {
     // Add navigation or modal logic here
   };
   // Create carousel items dynamically
-  const carouselItems = trips.map((trip) => (
+  const carouselItems = trips?.map((trip) => (
     <Card
       key={trip.trip_id} // Use a unique key for each card
       card={{
         // src: trip.cover_photo, // Assuming each trip has a cover_photo field
+        src:"",
         title: `${trip.source} to ${trip.destination}`, // Dynamic title based on trip info
         category: trip.genre, // Dynamic category based on genre
         content: <p>{trip.blog || "No description available"}</p>, // Assuming there's a blog field for content
@@ -61,9 +54,15 @@ const MyPage = () => {
 
   return (
     <Layout>
-      <div>
-        <h1>My Image Carousel</h1>
-        <Carousel items={carouselItems} initialScroll={0} />
+      <div className="p-4">
+        <h1 className="text-3xl font-bold">My Trips</h1>
+
+        {
+          trips.length != 0 ? (
+            <Carousel items={carouselItems} initialScroll={0} />
+          ) :
+          <p className="text-center py-12"> It seems you haven't added any trips </p>
+        }
       </div>
     </Layout>
   );

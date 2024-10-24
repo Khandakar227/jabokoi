@@ -13,10 +13,9 @@ export default function TravelingCost({busList, trainList}:TravellingProps) {
     <div className="w-full">
     <h2 className="font-bold text-3xl pb-4">Travelling Cost</h2>
     <Tabs defaultValue="Bus" className="bg-neutral-800 py-4">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="Bus">Bus</TabsTrigger>
-        <TabsTrigger value="Train">Train</TabsTrigger>
-        <TabsTrigger value="Plane">Plane</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="Bus" className="text-xl">Bus</TabsTrigger>
+        <TabsTrigger value="Train" className="text-xl">Train</TabsTrigger>
       </TabsList>
       <TabsContent value="Bus">
         <p className="py-5 px-4 text-2xl">
@@ -62,9 +61,6 @@ export default function TravelingCost({busList, trainList}:TravellingProps) {
                 )
             )
         }
-      </TabsContent>
-      <TabsContent value="Plane">
-
       </TabsContent>
       </Tabs>
     </div>

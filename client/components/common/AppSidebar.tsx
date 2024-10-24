@@ -1,4 +1,4 @@
-import { Bus, Home, TicketsPlane, Hotel, Backpack, LogIn } from "lucide-react"
+import { Bus, Home, TicketsPlane, Hotel, Backpack, LogIn, MemoryStick } from "lucide-react"
 
 import {
   Sidebar,
@@ -20,24 +20,19 @@ const items = [
     icon: Home,
   },
   {
+    title: "Trip",
+    url: "/trip",
+    icon: Bus,
+  },
+  {
     title: "Travel Blogs",
     url: "#",
     icon: Backpack,
   },
   {
-    title: "Flight",
-    url: "#",
-    icon: TicketsPlane,
-  },
-  {
-    title: "Bus",
-    url: "#",
-    icon: Bus,
-  },
-  {
-    title: "Hotels",
-    url: "#",
-    icon: Hotel,
+    title: "Memories",
+    url: "/memories",
+    icon: MemoryStick,
   },
   {
     title: "Login",
