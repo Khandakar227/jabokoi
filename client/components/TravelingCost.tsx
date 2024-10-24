@@ -25,7 +25,7 @@ export default function TravelingCost({busList, trainList}:TravellingProps) {
         {
             busList.map((bus, index) => {
                 return (
-                <div key={index + bus.company_id} className="flex items-center gap-4 py-2 px-4 shadow shadow-gray-600 m-2 rounded-md bg-zinc-950">
+                <div key={index + bus.company_id + Math.random()} className="flex items-center gap-4 py-2 px-4 shadow shadow-gray-600 m-2 rounded-md bg-zinc-950">
                     <img src={bus.company_logo_url} alt={bus.company_name} className="w-20"/>
                     <div className="flex-auto">
                         <div className="w-full flex justify-between items-center gap-4">
@@ -46,12 +46,12 @@ export default function TravelingCost({busList, trainList}:TravellingProps) {
         </p>
         {
             trainList.map((train, index) => (
-                <div key={index + train?.trip_number} className="py-2 px-4 shadow shadow-gray-600 m-2 rounded-md bg-zinc-950">
+                <div key={index + "t"} className="py-2 px-4 shadow shadow-gray-600 m-2 rounded-md bg-zinc-950">
                     <p className="text-2xl font-bold">{train?.trip_number}</p>
                     <div className="flex-auto flex gap-4 items-center justify-start pt-4">
                     {
-                        train?.seat_types?.map((seat: any, index: any) => (
-                            <div key={train?.trip_number + seat?.type} className="rounded bg-neutral-800 p-4">
+                        train?.seat_types?.map((seat: any, _index: any) => (
+                            <div key={index+ _index + seat?.type} className="rounded bg-neutral-800 p-4">
                                 <p className="text-gray-200">{seat?.type}</p>
                                 <p className="font-bold">{seat?.fare == 0 ? 'N/A' : '৳'+seat?.fare}</p>
                             </div>

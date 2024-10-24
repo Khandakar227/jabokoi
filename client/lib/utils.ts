@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getShohozSignIn = () => {
-  const options = {method: 'GET'};
+  const options = { method: 'GET' };
   fetch('/api/shohozsignin', options)
     .then(response => response.json())
     .then(response => {
@@ -16,7 +16,7 @@ export const getShohozSignIn = () => {
     .catch(err => console.error(err));
 }
 
-export const getBusRoutes = async (from_city:string, to_city: string, date_of_journey:string) => {
+export const getBusRoutes = async (from_city: string, to_city: string, date_of_journey: string) => {
   const options = {
     method: 'GET',
     headers: {
@@ -29,7 +29,7 @@ export const getBusRoutes = async (from_city:string, to_city: string, date_of_jo
   return data;
 }
 
-export const getTrainRoutes = async (from_city:string, to_city: string, date_of_journey:string, seat_class:string) => {
+export const getTrainRoutes = async (from_city: string, to_city: string, date_of_journey: string, seat_class: string) => {
   const options = {
     method: 'GET',
     headers: {
@@ -45,85 +45,84 @@ export const getTrainRoutes = async (from_city:string, to_city: string, date_of_
 
 export function formatDate(date: Date) {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  
+
   const day = date.getDate();
   const month = months[date.getMonth()];
   const year = date.getFullYear();
-  
+
   return `${day}-${month}-${year}`;
 }
 
 export const getMaxBusFare = (arr: any[]) => {
   return arr.reduce((max, item) => {
     return item.business_class_fare && item.business_class_fare > max ? item.business_class_fare : max;
-  }, 0); 
+  }, 0);
 }
 
-export const getMinBusFare = (arr:{business_class_fare: number}[]) => {
+export const getMinBusFare = (arr: { business_class_fare: number }[]) => {
   return arr.reduce((min, item) => {
     return item.business_class_fare && (item.business_class_fare < min) ? item.business_class_fare : min;
   }, Infinity);
 }
 
-function getMaxSeatFare(train:any) {
-  let maxFare = train.seat_types.reduce((max:any, seat:any) => {
-      const fare = parseFloat(seat.fare);
-      return fare > max ? fare : max;
+function getMaxSeatFare(train: any) {
+  let maxFare = train.seat_types.reduce((max: any, seat: any) => {
+    const fare = parseFloat(seat.fare);
+    return fare > max ? fare : max;
   }, 0); // initialize with 0
   return maxFare;
 }
 
 // Function to get the minimum seat fare
-function getMinSeatFare(train:any) {
-  let minFare = train.seat_types.reduce((min:any, seat:any) => {
-      const fare = parseFloat(seat.fare);
-      return (fare > 0 && (fare < min || min === 0)) ? fare : min;
+function getMinSeatFare(train: any) {
+  let minFare = train.seat_types.reduce((min: any, seat: any) => {
+    const fare = parseFloat(seat.fare);
+    return (fare > 0 && (fare < min || min === 0)) ? fare : min;
   }, 0); // initialize with 0
   return minFare;
 }
 
 // get overall min fare
-export const getMinTrainFare = (trains:any) => {
+export const getMinTrainFare = (trains: any) => {
   let minFare = Infinity;
-  trains.forEach((train:any) => {
-      const minSeatFare = getMinSeatFare(train);
-      if (minSeatFare < minFare) {
-          minFare = minSeatFare;
-      }
+  trains.forEach((train: any) => {
+    const minSeatFare = getMinSeatFare(train);
+    if (minSeatFare < minFare) {
+      minFare = minSeatFare;
+    }
   });
   return minFare;
 }
 
-export const getMaxTrainFare = (trains:any) => {
+export const getMaxTrainFare = (trains: any) => {
   let maxFare = 0;
-  trains.forEach((train:any) => {
-      const maxSeatFare = getMaxSeatFare(train);
-      if (maxSeatFare > maxFare) {
-          maxFare = maxSeatFare;
-      }
+  trains.forEach((train: any) => {
+    const maxSeatFare = getMaxSeatFare(train);
+    if (maxSeatFare > maxFare) {
+      maxFare = maxSeatFare;
+    }
   });
   return maxFare;
 }
 
-export const getNearbyHotels = async (lat:string, long:string, arrival_date: string, {days_to_stay=1, room_qty=1}) => {
+export const getNearbyHotels = async (lat: string, long: string, arrival_date: string, { days_to_stay = 1, room_qty = 1 }) => {
   let d = new Date(arrival_date);
   d.setDate(d.getDate() + days_to_stay);
-  let departure_date = formatDate(d);
+  let departure_date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  const url = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotelsByCoordinates?latitude=${lat}&longitude=${long}&arrival_date=${arrival_date}&departure_date=${departure_date}&radius=10&adults=1&children_age=0%2C17&room_qty=${room_qty}&units=metric&page_number=1&temperature_unit=c&languagecode=en-us&currency_code=USD`;
+  const options = {
+    method: 'GET',
+    headers: {
+      'x-rapidapi-key': process.env.XRapidapiKey as string,
+      'x-rapidapi-host': process.env.XRapidapiHost as string
+    }
+  };
 
-  const url =  `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotelsByCoordinates?latitude=${lat}&longitude=${long}&arrival_date=${arrival_date}&departure_date=${departure_date}&radius=10&adults=1&children_age=0%2C17&room_qty=${room_qty}&units=metric&page_number=1&temperature_unit=c&languagecode=en-us&currency_code=BDT`;
-const options = {
-	method: 'GET',
-	headers: {
-		'x-rapidapi-key': process.env.XRapidapiKey as string,
-		'x-rapidapi-host': process.env.XRapidapiHost as string
-	}
-};
-
-try {
-	const response = await fetch(url, options);
-	const result = await response.json();
-	return result;
-} catch (error) {
-	console.error(error);
-}
+  try {
+    const response = await fetch(url, options);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
 }

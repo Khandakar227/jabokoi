@@ -12,6 +12,7 @@ import { Address } from "@/components/ui/AutoComplete";
 import Spinner from "@/components/common/Spinner";
 import TravelingCost from "@/components/TravelingCost";
 import Hotels from "@/components/Hotels";
+import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   const [fromAddress, setFromAddress] = useState({} as Address);
@@ -26,15 +27,15 @@ export default function Home() {
   }, [])
 
   const onSearch = async () => {
-    if(!fromAddress.division || !toAddress.division) return;
+    if(!fromAddress.division || !toAddress.division || !toAddress?.district) return;
     setLoading(true);
-    const busTrips = await getBusRoutes(fromAddress?.division, toAddress?.division, formatDate(new Date()));
+    const busTrips = await getBusRoutes(fromAddress?.division, (toAddress?.division == fromAddress?.division ? toAddress?.district : toAddress?.division), formatDate(new Date()));
     setBusList(busTrips?.list|| []);
     // remove elements that have no business class fare or business fare is 0
     setBusList(b => b.filter((bus:any) => bus.business_class_fare > 0));
     console.log(busTrips?.list|| []);
     //Tomorrow date
-    const trainTrips = await getTrainRoutes(fromAddress?.division, toAddress?.division,
+    const trainTrips = await getTrainRoutes(fromAddress?.division, (toAddress?.division == fromAddress?.division ? toAddress?.district : toAddress?.division),
       formatDate(new Date(Date.now() + 24 * 60 * 60 * 1000)), "SNIGDHA");
     setTrainList(trainTrips|| []);
     setLoaded(true);
@@ -67,7 +68,7 @@ export default function Home() {
             </div>
             <div className="mx-auto text-center">
               <Button className="bg-blue-600 text-white py-2 px-2 rounded" onClick={onSearch}>
-                <Search size={20} /> Search
+                <Search size={20} /> Get Trip Idea
               </Button>
             </div>
           </div>
@@ -84,8 +85,17 @@ export default function Home() {
           {
             loaded && (
               <>
-                <TravelingCost busList={busList} trainList={trainList}/>
-                <Hotels dest={toAddress} />
+              {/* <Tabs>
+                <TabsTrigger value="TravelingCost"> <h2 className="text-xl">Traveling Cost</h2> </TabsTrigger>
+                <TabsTrigger value="Hotels"> <h2 className="text-xl">Hotels</h2> </TabsTrigger>
+                <TabsContent value="TravelingCost">
+                </TabsContent>
+                
+                <TabsContent value="Hotels">
+                </TabsContent>
+              </Tabs> */}
+                  <TravelingCost busList={busList} trainList={trainList}/>
+                  <Hotels dest={toAddress} />
               </>
             )
           }
