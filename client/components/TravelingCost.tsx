@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getMaxBusFare, getMinBusFare } from "@/lib/utils";
+import { getMaxBusFare, getMaxTrainFare, getMinBusFare, getMinTrainFare } from "@/lib/utils";
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode } from "react";
 
 interface TravellingProps {
@@ -8,11 +8,11 @@ interface TravellingProps {
 }
 
 export default function TravelingCost({busList, trainList}:TravellingProps) {
-    console.log(trainList);
-  return (
+
+    return (
     <div className="w-full">
     <h2 className="font-bold text-3xl pb-4">Travelling Cost</h2>
-    <Tabs defaultValue="Bus" className="bg-neutral-800">
+    <Tabs defaultValue="Bus" className="bg-neutral-800 py-4">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="Bus">Bus</TabsTrigger>
         <TabsTrigger value="Train">Train</TabsTrigger>
@@ -20,7 +20,7 @@ export default function TravelingCost({busList, trainList}:TravellingProps) {
       </TabsList>
       <TabsContent value="Bus">
         <p className="py-5 px-4 text-2xl">
-        Cost range for bus: <b>{+getMinBusFare(busList)} - {+getMaxBusFare(busList)} BDT</b>
+        Cost range for Bus: <b>৳{+getMinBusFare(busList)} - ৳{+getMaxBusFare(busList)}</b>
         </p>
         {
             busList.map((bus, index) => {
@@ -41,6 +41,9 @@ export default function TravelingCost({busList, trainList}:TravellingProps) {
         }
       </TabsContent>
       <TabsContent value="Train">
+        <p className="py-5 px-4 text-2xl">
+        Cost range for Train: <b>৳{+getMinTrainFare(trainList)} - ৳{+getMaxTrainFare(trainList)}</b>
+        </p>
         {
             trainList.map((train, index) => (
                 <div key={index + train?.trip_number} className="py-2 px-4 shadow shadow-gray-600 m-2 rounded-md bg-zinc-950">
