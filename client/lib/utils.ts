@@ -55,12 +55,12 @@ export function formatDate(date: Date) {
 
 export const getMaxBusFare = (arr: any[]) => {
   return arr.reduce((max, item) => {
-    return item.business_class_fare && item.business_class_fare > max.business_class_fare ? item.business_class_fare : max?.business_class_fare;
+    return item.business_class_fare && item.business_class_fare > max? item.business_class_fare : max;
   }, 0); 
 }
 
 export const getMinBusFare = (arr:any[]) => {
   return arr.reduce((min, item) => {
-    return item.business_class_fare && (item.business_class_fare < min.business_class_fare) ? item.business_class_fare : min?.business_class_fare;
+    return item.business_class_fare && (item.business_class_fare < min) ? item.business_class_fare : min;
   }, Infinity);
 }
