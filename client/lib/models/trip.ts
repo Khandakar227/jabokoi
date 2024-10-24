@@ -10,8 +10,11 @@ export interface ITrip extends Document {
   bus: {name: string, price:  number};
   train: {name: string, price:  number};
   plane: {name: string, price:  number};
-  meal: boolean;
-  hotel: boolean;
+  hotel: {
+    name: string;
+    price: number;
+    room_qty: number;
+  };
   blog: string;
   cover_photo: string;
   photos: string[];
@@ -37,10 +40,6 @@ const tripSchema = new Schema<ITrip>({
     type: String,
     required: true
   },
-  genre: {
-    type: String,
-    required: true
-  },
   bus: {
     name: {
       type: String,
@@ -61,13 +60,19 @@ const tripSchema = new Schema<ITrip>({
       default: 0
     }
   },
-  meal: {
-    type: Boolean,
-    default: false
-  },
   hotel: {
-    type: Boolean,
-    default: false
+    name: {
+      type: String,
+      default: ''
+    },
+    price: {
+      type: Number,
+      default: 0
+    },
+    room_qty: {
+      type: Number,
+      default: 0
+    }
   },
   blog: {
     type: String,
