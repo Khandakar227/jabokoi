@@ -12,6 +12,7 @@ import { Address } from "@/components/ui/AutoComplete";
 import Spinner from "@/components/common/Spinner";
 import TravelingCost from "@/components/TravelingCost";
 import Hotels from "@/components/Hotels";
+import { calcRoute, initMap } from '../lib/route';
 import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
@@ -40,6 +41,8 @@ export default function Home() {
     setTrainList(trainTrips|| []);
     setLoaded(true);
     setLoading(false);
+    initMap();
+    calcRoute(fromAddress.location.lat, fromAddress.location.lng, toAddress.location.lat, toAddress.location.lng);
   }
 
   return (
@@ -74,6 +77,8 @@ export default function Home() {
           </div>
         </div>
 
+        <div id="map" style={{ height: '500px', width: '80%', borderRadius: '12px', margin: '0 auto' }}></div>
+
         <div className="py-8">
           {
             loading && (
@@ -101,6 +106,8 @@ export default function Home() {
           }
         </div>
       </div>
+      
+
     </Layout>
   );
 }
