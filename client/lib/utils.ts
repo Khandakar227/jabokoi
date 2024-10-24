@@ -55,12 +55,75 @@ export function formatDate(date: Date) {
 
 export const getMaxBusFare = (arr: any[]) => {
   return arr.reduce((max, item) => {
-    return item.business_class_fare && item.business_class_fare > max? item.business_class_fare : max;
+    return item.business_class_fare && item.business_class_fare > max ? item.business_class_fare : max;
   }, 0); 
 }
 
-export const getMinBusFare = (arr:any[]) => {
+export const getMinBusFare = (arr:{business_class_fare: number}[]) => {
   return arr.reduce((min, item) => {
     return item.business_class_fare && (item.business_class_fare < min) ? item.business_class_fare : min;
   }, Infinity);
+}
+
+function getMaxSeatFare(train:any) {
+  let maxFare = train.seat_types.reduce((max:any, seat:any) => {
+      const fare = parseFloat(seat.fare);
+      return fare > max ? fare : max;
+  }, 0); // initialize with 0
+  return maxFare;
+}
+
+// Function to get the minimum seat fare
+function getMinSeatFare(train:any) {
+  let minFare = train.seat_types.reduce((min:any, seat:any) => {
+      const fare = parseFloat(seat.fare);
+      return (fare > 0 && (fare < min || min === 0)) ? fare : min;
+  }, 0); // initialize with 0
+  return minFare;
+}
+
+// get overall min fare
+export const getMinTrainFare = (trains:any) => {
+  let minFare = Infinity;
+  trains.forEach((train:any) => {
+      const minSeatFare = getMinSeatFare(train);
+      if (minSeatFare < minFare) {
+          minFare = minSeatFare;
+      }
+  });
+  return minFare;
+}
+
+export const getMaxTrainFare = (trains:any) => {
+  let maxFare = 0;
+  trains.forEach((train:any) => {
+      const maxSeatFare = getMaxSeatFare(train);
+      if (maxSeatFare > maxFare) {
+          maxFare = maxSeatFare;
+      }
+  });
+  return maxFare;
+}
+
+export const getNearbyHotels = async (lat:string, long:string, arrival_date: string, {days_to_stay=1, room_qty=1}) => {
+  let d = new Date(arrival_date);
+  d.setDate(d.getDate() + days_to_stay);
+  let departure_date = formatDate(d);
+
+  const url =  `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotelsByCoordinates?latitude=${lat}&longitude=${long}&arrival_date=${arrival_date}&departure_date=${departure_date}&radius=10&adults=1&children_age=0%2C17&room_qty=${room_qty}&units=metric&page_number=1&temperature_unit=c&languagecode=en-us&currency_code=BDT`;
+const options = {
+	method: 'GET',
+	headers: {
+		'x-rapidapi-key': process.env.XRapidapiKey as string,
+		'x-rapidapi-host': process.env.XRapidapiHost as string
+	}
+};
+
+try {
+	const response = await fetch(url, options);
+	const result = await response.json();
+	return result;
+} catch (error) {
+	console.error(error);
+}
 }

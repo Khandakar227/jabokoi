@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { Address } from "@/components/ui/AutoComplete";
 import Spinner from "@/components/common/Spinner";
 import TravelingCost from "@/components/TravelingCost";
+import Hotels from "@/components/Hotels";
 
 export default function Home() {
   const [fromAddress, setFromAddress] = useState({} as Address);
@@ -29,6 +30,8 @@ export default function Home() {
     setLoading(true);
     const busTrips = await getBusRoutes(fromAddress?.division, toAddress?.division, formatDate(new Date()));
     setBusList(busTrips?.list|| []);
+    // remove elements that have no business class fare or business fare is 0
+    setBusList(b => b.filter((bus:any) => bus.business_class_fare > 0));
     console.log(busTrips?.list|| []);
     //Tomorrow date
     const trainTrips = await getTrainRoutes(fromAddress?.division, toAddress?.division,
@@ -80,7 +83,10 @@ export default function Home() {
           }
           {
             loaded && (
-              <TravelingCost busList={busList} trainList={trainList}/>
+              <>
+                <TravelingCost busList={busList} trainList={trainList}/>
+                <Hotels dest={toAddress} />
+              </>
             )
           }
         </div>
