@@ -1,0 +1,65 @@
+[
+        {
+            "name": "Barisal Airport",
+            "iata_code": "BZL",
+            "city": "Barisal",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Cox's Bazar Airport",
+            "iata_code": "CXB",
+            "city": "Cox's Bazar",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Hazrat Shahjalal International Airport",
+            "iata_code": "DAC",
+            "city": "Dhaka",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Ishurdi Airport",
+            "iata_code": "IRD",
+            "city": "Ishurdi",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Jessore Airport",
+            "iata_code": "JSR",
+            "city": "Jessore",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Osmany International Airport",
+            "iata_code": "ZYL",
+            "city": "Sylhet Osmani",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Saidpur Airport",
+            "iata_code": "SPD",
+            "city": "Saidpur",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Shah Amanat International Airport",
+            "iata_code": "CGP",
+            "city": "Chittagong",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        },
+        {
+            "name": "Shah Mokhdum Airport",
+            "iata_code": "RJH",
+            "city": "Rajshahi",
+            "country": "Bangladesh",
+            "country_code": "BD"
+        }
+    ]
