@@ -126,3 +126,20 @@ export const getNearbyHotels = async (lat: string, long: string, arrival_date: s
     console.error(error);
   }
 }
+
+
+export const getLatLong = async (locationName:string, API_KEY:string) => {
+  const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(locationName)}&key=${API_KEY}`;
+
+  try {
+    const response = await fetch(geocodeUrl);
+    const data = await response.json();
+    const location = data.results[0].geometry.location;
+    console.log('Latitude:', location.lat);
+    console.log('Longitude:', location.lng);
+    
+    return location; // {lat: ..., lng: ...}
+  } catch (error) {
+    console.error('Error fetching coordinates:', error);
+  }
+};
