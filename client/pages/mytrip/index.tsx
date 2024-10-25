@@ -1,51 +1,6 @@
 import React, { useState, useEffect } from "react";
-import KeenSlider, { KeenSliderInstance } from "keen-slider";
 import { Button } from "@/components/ui/button";
 
-const gallaryArrowsInit = (slider: KeenSliderInstance) => {
-  const leftArrow = document.getElementById("gallary-left-arrow");
-  const rightArrow = document.getElementById("gallary-right-arrow");
-
-  if (leftArrow) leftArrow.addEventListener("click", () => slider.prev());
-  if (rightArrow) rightArrow.addEventListener("click", () => slider.next());
-};
-
-const addDots = (slider: KeenSliderInstance, wrapperSelector: string) => {
-  const dots = document.createElement("div");
-  dots.className = "dots";
-  const wrapper = document.querySelector(wrapperSelector);
-
-  if (wrapper) {
-    while (wrapper.firstChild) {
-      wrapper.removeChild(wrapper.firstChild);
-    }
-
-    slider.track.details.slides.forEach((_e, idx) => {
-      const dot = document.createElement("div");
-      dot.className = "dot";
-      if (idx === 0) dot.classList.add("dot--active");
-      dot.addEventListener("click", () => slider.moveToIdx(idx));
-      dots.appendChild(dot);
-    });
-
-    const updateClasses = () => {
-      const slide = slider.track.details.rel;
-      Array.from(dots.children).forEach((dot, idx) => {
-        if (dot instanceof HTMLElement) {
-          idx === slide
-            ? dot.classList.add("dot--active")
-            : dot.classList.remove("dot--active");
-        }
-      });
-    };
-
-    wrapper.appendChild(dots);
-
-    slider.on("created", updateClasses);
-    slider.on("optionsChanged", updateClasses);
-    slider.on("slideChanged", updateClasses);
-  }
-};
 
 const TripSummary: React.FC = () => {
   const [vlogs, setVlogs] = useState<Array<{ id: number; title: string; url: string }>>([]);
@@ -67,18 +22,6 @@ const TripSummary: React.FC = () => {
       alt: "Trip Image 3",
     },
   ];
-
-  useEffect(() => {
-    const gallaryCarousel = new KeenSlider("#gallary-carousel", {
-      loop: true,
-      mode: "snap",
-      rtl: false,
-      slides: { perView: "auto", spacing: 16 },
-    });
-
-    gallaryArrowsInit(gallaryCarousel);
-    addDots(gallaryCarousel, ".gallary-dots-header");
-  }, []);
 
   const handleGenerateVlog = () => {
     const newVlog = {
@@ -152,25 +95,6 @@ const TripSummary: React.FC = () => {
           </div>
         </section>
       </div>
-
-      <style jsx>{`
-        .dot {
-          width: 10px;
-          height: 10px;
-          background: #c5c5c5;
-          border-radius: 50%;
-          cursor: pointer;
-          margin: 0 5px;
-        }
-        .dot--active {
-          background: #000;
-        }
-        .keen-slider__slide {
-          min-width: 100%;
-          max-width: 100%;
-          padding: 0 8px;
-        }
-      `}</style>
     </div>
   );
 };

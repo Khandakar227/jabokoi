@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await dbConnect();
   
     try {
-      const trip = await Trip.findOne({ trip_id: trip_id });
+      const trip = await Trip.findById(trip_id);
   
       if (!trip) {
         return res.status(404).json({ message: 'Trip not found' });

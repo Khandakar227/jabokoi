@@ -22,6 +22,7 @@ import { calcRoute, initMap } from "../lib/route";
 import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { ThermometerSun, ThermometerSnowflake, Wind, CloudRainWind } from 'lucide-react';
 import { useTrip } from "@/hooks/use-trip";
+import { imageServer } from "@/lib/const";
 
 interface Weather {
   coord: {
@@ -76,6 +77,7 @@ export default function Home() {
   const [loaded, setLoaded] = useState(false);
   const [weather, setWeather] = useState({} as any);
   const [error, setError] = useState("");
+  const [itineraryText, setItineraryText] = useState("");
 
   const [trip, setTrip] = useTrip();
 
@@ -107,6 +109,7 @@ export default function Home() {
       setError("Failed to fetch weather data"); // Handle fetch error
     }
   };
+
   const onSearch = async () => {
     if (!fromAddress.division || !toAddress.division || !toAddress?.district)
       return;
@@ -125,6 +128,7 @@ export default function Home() {
         room_qty: 0,
       },
     });
+
     setLoading(true);
     const busTrips = await getBusRoutes(
       fromAddress?.division,
@@ -133,6 +137,7 @@ export default function Home() {
         : toAddress?.division,
       formatDate(new Date())
     );
+
     setBusList(busTrips?.list || []);
     // remove elements that have no business class fare or business fare is 0
     setBusList((b) => b.filter((bus: any) => bus.business_class_fare > 0));
@@ -189,12 +194,31 @@ export default function Home() {
         source: "",
         destination: "",
       })
+      generateItinerary();
     } catch (error) {
       console.log(error)
     } finally {
       (e.target as HTMLButtonElement).disabled = false;
       (e.target as HTMLButtonElement).innerText = "Create a Trip";
     }
+  }
+
+  function generateItinerary() {
+    const userId = "671a2e6ddbc951827deda3ff";
+    const albumId = "671a2e6ddbc";
+
+    fetch(`${imageServer}/generate-travel-itinerary`, {
+      body: JSON.stringify({ user_id:userId, album_id:albumId, trip_info_json: JSON.stringify(trip) }),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setItineraryText(data.result);
+        console.log(data);
+      });
   }
 
   return (
@@ -313,6 +337,15 @@ export default function Home() {
               </Tabs> */}
               <TravelingCost busList={busList} trainList={trainList} />
               <Hotels dest={toAddress} />
+
+              {
+                itineraryText && (
+                <div className="py-12">
+                  <h1 className="text-2xl font-bold">Travel Itinerary</h1>
+                  <div className="whitespace-pre-wrap py-6">{itineraryText}</div>
+                </div>
+                  )
+              }
             </>
           )}
         </div>
