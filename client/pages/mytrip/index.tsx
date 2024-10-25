@@ -1,8 +1,6 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import KeenSlider, { KeenSliderInstance } from "keen-slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 const gallaryArrowsInit = (slider: KeenSliderInstance) => {
   const leftArrow = document.getElementById("gallary-left-arrow");
@@ -50,18 +48,7 @@ const addDots = (slider: KeenSliderInstance, wrapperSelector: string) => {
 };
 
 const TripSummary: React.FC = () => {
-  const vlogs = [
-    {
-      id: 1,
-      title: "Vlog 1",
-      url: "https://www.youtube.com/embed/your_dummy_video_url1",
-    },
-    {
-      id: 2,
-      title: "Vlog 2",
-      url: "https://www.youtube.com/embed/your_dummy_video_url2",
-    },
-  ];
+  const [vlogs, setVlogs] = useState<Array<{ id: number; title: string; url: string }>>([]);
 
   const galleryImages = [
     {
@@ -93,26 +80,48 @@ const TripSummary: React.FC = () => {
     addDots(gallaryCarousel, ".gallary-dots-header");
   }, []);
 
+  const handleGenerateVlog = () => {
+    const newVlog = {
+      id: vlogs.length + 1,
+      title: `Vlog ${vlogs.length + 1}`,
+      url: `https://www.youtube.com/embed/your_dummy_video_url${vlogs.length + 1}`,
+    };
+    setVlogs([...vlogs, newVlog]);
+  };
+
   return (
-    <div className="trip-summary">
-      <h1>Trip Summary</h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold text-center mb-12">Trip Summary</h1>
+      
+      <div className="flex justify-center items-center space-x-4 mb-12">
+        <div className="text-lg">
+          <span className="font-semibold">From:</span> Dhaka
+        </div>
+        <div className="text-2xl">→</div>
+        <div className="text-lg">
+          <span className="font-semibold">To:</span> Gazipur
+        </div>
+      </div>
 
-      <Tabs defaultValue="vlogs" className="bg-neutral-800">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="vlogs">Vlogs</TabsTrigger>
-          <TabsTrigger value="gallery">Gallery</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="vlogs">
-          <div className="vlog-section">
-            <h2>Vlogs</h2>
-            <div className="vlogs">
-              {vlogs.map((vlog) => (
-                <div key={vlog.id} className="vlog-item">
-                  <h3>{vlog.title}</h3>
+      <div className="space-y-12">
+        <section className="vlog-section">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold">Vlogs</h2>
+            <Button 
+              onClick={handleGenerateVlog}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Generate Vlog
+            </Button>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-2">
+            {vlogs.map((vlog) => (
+              <div key={vlog.id} className="vlog-item bg-neutral-100 rounded-lg p-4">
+                <h3 className="text-xl font-medium mb-3">{vlog.title}</h3>
+                <div className="aspect-video">
                   <iframe
-                    width="560"
-                    height="315"
+                    className="w-full h-full rounded-lg"
                     src={vlog.url}
                     title={vlog.title}
                     frameBorder="0"
@@ -120,57 +129,46 @@ const TripSummary: React.FC = () => {
                     allowFullScreen
                   ></iframe>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        </TabsContent>
+        </section>
 
-        <TabsContent value="gallery">
-          <div className="gallery-section">
-            <h2>Gallery</h2>
-            <div id="gallary-carousel" className="keen-slider flex">
-              {galleryImages.map((image) => (
-                <div key={image.id} className="keen-slider__slide">
-                  <img src={image.src} alt={image.alt} />
-                </div>
-              ))}
-            </div>
-            <div className="gallary-dots-header"></div>
+        <section className="gallery-section">
+          <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
+          <div id="gallary-carousel" className="keen-slider flex">
+            {galleryImages.map((image) => (
+              <div key={image.id} className="keen-slider__slide">
+                <img 
+                  src={image.src} 
+                  alt={image.alt} 
+                  className="rounded-lg w-full h-auto"
+                />
+              </div>
+            ))}
           </div>
-        </TabsContent>
-      </Tabs>
+          <div className="gallary-dots-header flex justify-center mt-4 space-x-2">
+            {/* Dots will be inserted here by the addDots function */}
+          </div>
+        </section>
+      </div>
 
       <style jsx>{`
-        .tabs {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
-        }
-
-        .tabs button {
-          padding: 10px 20px;
+        .dot {
+          width: 10px;
+          height: 10px;
+          background: #c5c5c5;
+          border-radius: 50%;
           cursor: pointer;
-          border: none;
-          background-color: #f0f0f0;
-          border-radius: 5px;
+          margin: 0 5px;
         }
-
-        .active-tab {
-          background-color: #0070f3;
-          color: white;
+        .dot--active {
+          background: #000;
         }
-
-        .vlog-section,
-        .gallery-section {
-          margin-top: 20px;
-        }
-
-        .vlog-item {
-          margin-bottom: 20px;
-        }
-
-        .tab-content {
-          min-height: 300px;
+        .keen-slider__slide {
+          min-width: 100%;
+          max-width: 100%;
+          padding: 0 8px;
         }
       `}</style>
     </div>
@@ -178,6 +176,5 @@ const TripSummary: React.FC = () => {
 };
 
 export default TripSummary;
-
 
 
