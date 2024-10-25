@@ -1,15 +1,20 @@
-import { atom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 
 export const tripAtom = atom({
     user_id: "",
     source: "",
     destination: "",
-    bus: {
+    vehicle: {
         name: "",
-        price: 0
+        price: 0,
+        type: ""
     },
-    train: {
+    hotel: {
         name: "",
-        price: 0
+        price: 0,
+        room_qty: 0
     },
-})
+});
+
+
+export const useTrip = () => useAtom(tripAtom);

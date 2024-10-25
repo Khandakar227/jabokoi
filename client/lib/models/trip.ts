@@ -1,14 +1,11 @@
 import { Schema, model, models, Document } from 'mongoose';
 
 // Define an interface for the Trip document
-export interface ITrip extends Document {
-  trip_id: string;
+export interface ITrip {
   user_id: Schema.Types.ObjectId;
   source: string;
   destination: string;
-  genre: string;
-  bus: {name: string, price:  number};
-  train: {name: string, price:  number};
+  vehicle: {name: string, price:  number, type: string};
   plane: {name: string, price:  number};
   hotel: {
     name: string;
@@ -21,12 +18,7 @@ export interface ITrip extends Document {
 }
 
 // Create the Trip schema
-const tripSchema = new Schema<ITrip>({
-  trip_id: {
-    type: String,
-    required: true,
-    unique: true
-  },
+const tripSchema = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -40,7 +32,7 @@ const tripSchema = new Schema<ITrip>({
     type: String,
     required: true
   },
-  bus: {
+  vehicle: {
     name: {
       type: String,
       default: ''
@@ -48,16 +40,10 @@ const tripSchema = new Schema<ITrip>({
     price: {
       type: Number,
       default: 0
-    }
-  },
-  train: {
-    name: {
-      type: String,
-      default: ''
     },
-    price: {
-      type: Number,
-      default: 0
+    type: {
+      type: String,
+      default: 'bus'
     }
   },
   hotel: {

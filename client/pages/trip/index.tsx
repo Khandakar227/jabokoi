@@ -30,20 +30,19 @@ const MyPage = () => {
 
   const router = useRouter(); 
   const handleCardClick = (trip: ITrip) => {
-    console.log(`Clicked on trip: ${trip.trip_id}`);
-    router.push(`/trip/${trip.trip_id}`);
+    console.log(`Clicked on trip: ${trip.id}`);
+    router.push(`/trip/${trip.id}`);
 
     // Add navigation or modal logic here
   };
   // Create carousel items dynamically
   const carouselItems = trips?.map((trip) => (
     <Card
-      key={trip.trip_id} // Use a unique key for each card
+      key={trip.id} // Use a unique key for each card
       card={{
         // src: trip.cover_photo, // Assuming each trip has a cover_photo field
         src:"",
         title: `${trip.source} to ${trip.destination}`, // Dynamic title based on trip info
-        category: trip.genre, // Dynamic category based on genre
         content: <p>{trip.blog || "No description available"}</p>, // Assuming there's a blog field for content
         
       }}

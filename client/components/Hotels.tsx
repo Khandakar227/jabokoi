@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Address } from "./ui/AutoComplete"
+import { useTrip } from "@/hooks/use-trip";
 
 interface HotelsProps {
     dest: Address
@@ -8,6 +9,7 @@ interface HotelsProps {
 
 export default function Hotels({dest}:HotelsProps) {
     const [hotels, setHotels] = useState([]);
+
     useEffect(() => {
         fetch(`/api/getNearbyHotels?lat=${dest.location.lat}&long=${dest.location.lng}&arrival_date=2024-10-26&days_to_stay=1&room_qty=1`)
         .then(res => res.json())
@@ -22,7 +24,7 @@ export default function Hotels({dest}:HotelsProps) {
     <div className="my-6 py-4 rounded-md shadow bg-neutral-800">
         <h2 className="font-bold text-3xl pb-4">Near by Hotels</h2>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-4">
             {hotels.map((hotel, index) => (
                 <HotelCard key={index} hotel={hotel} />
             ))}
@@ -32,11 +34,23 @@ export default function Hotels({dest}:HotelsProps) {
 }
 
 
-import React from 'react';
-
 const HotelCard = ({ hotel }:{hotel: any}) => {
-  return (
-    <div className="flex flex-col md:flex-row bg-white rounded-lg shadow-lg p-6 mb-6 max-w-lg mx-auto w-full">
+    const [trip, setTrip] = useTrip();
+
+    const selectHotel = (hotel: any) => {
+        setTrip({
+            ...trip,
+            hotel: {
+              price: hotel.min_total_price * 120,
+              name: hotel.hotel_name,
+              room_qty: 1,
+            },
+        });
+    }
+
+    return (
+    <div className="flex flex-col md:flex-row bg-white rounded-lg shadow-lg p-6 mb-6 max-w-lg mx-auto w-full cursor-pointer"
+    onClick={() => selectHotel(hotel)}>
       {/* Hotel Image */}
       <img
         src={hotel.main_photo_url}
