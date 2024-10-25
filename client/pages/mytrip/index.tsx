@@ -1,35 +1,57 @@
 import React, { useState, useEffect } from "react";
+import KeenSlider, { KeenSliderInstance } from "keen-slider";
 import { Button } from "@/components/ui/button";
-
+import { Loader2 } from "lucide-react";
+import { VideoGenerator } from "./videoGenerator";
+import { imageServer } from "@/lib/const";
 
 const TripSummary: React.FC = () => {
-  const [vlogs, setVlogs] = useState<Array<{ id: number; title: string; url: string }>>([]);
+  const [generatingVideo, setGeneratingVideo] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
 
-  const galleryImages = [
-    {
-      id: 1,
-      src: "https://via.placeholder.com/600x400?text=Image+1",
-      alt: "Trip Image 1",
-    },
-    {
-      id: 2,
-      src: "https://via.placeholder.com/600x400?text=Image+2",
-      alt: "Trip Image 2",
-    },
-    {
-      id: 3,
-      src: "https://via.placeholder.com/600x400?text=Image+3",
-      alt: "Trip Image 3",
-    },
-  ];
+  const [galleryImages, setGallaeryImages] = useState([] as any);
 
-  const handleGenerateVlog = () => {
-    const newVlog = {
-      id: vlogs.length + 1,
-      title: `Vlog ${vlogs.length + 1}`,
-      url: `https://www.youtube.com/embed/your_dummy_video_url${vlogs.length + 1}`,
-    };
-    setVlogs([...vlogs, newVlog]);
+  useEffect(() => {
+    fetch(imageServer+"/images?user_id=671a2e6ddbc951827deda3ff&album_id=671a2e6ddbc")
+    .then(res => res.json())
+    .then(data => {
+      setGallaeryImages(data.images.map((d:string, i:number) => {
+        return {
+          id: i,
+          src: imageServer + "/" + d,
+          alt: "Trip Image " + i,
+        }
+      }));
+    }).catch(err => {
+      console.log(err);
+    });
+  }, []);
+
+
+  const handleGenerateVlog = async () => {
+    setGeneratingVideo(true);
+    setGenerationProgress(0);
+  
+    try {
+      console.log(galleryImages)
+      const videoGenerator = new VideoGenerator(1280, 720); // 16:9 aspect ratio
+      const imageSources = galleryImages.map((img:any) => img.src);
+      
+      await videoGenerator.prepareFrames(imageSources, 4); // 4 seconds per image
+      
+      const videoBlob = await videoGenerator.generateVideo((progress) => {
+        setGenerationProgress(progress);
+      });
+  
+      const url = URL.createObjectURL(videoBlob);
+      setVideoUrl(url);
+    } catch (error) {
+      console.error('Error generating video:', error);
+      // Handle error appropriately
+    } finally {
+      setGeneratingVideo(false);
+    }
   };
 
   return (
@@ -49,49 +71,48 @@ const TripSummary: React.FC = () => {
       <div className="space-y-12">
         <section className="vlog-section">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Vlogs</h2>
+            <h2 className="text-2xl font-semibold">Trip Vlog</h2>
             <Button 
               onClick={handleGenerateVlog}
+              disabled={generatingVideo}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Generate Vlog
+              {generatingVideo ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating ({Math.round(generationProgress * 100)}%)
+                </>
+              ) : (
+                'Generate Vlog'
+              )}
             </Button>
           </div>
           
-          <div className="grid gap-6 md:grid-cols-2">
-            {vlogs.map((vlog) => (
-              <div key={vlog.id} className="vlog-item bg-neutral-100 rounded-lg p-4">
-                <h3 className="text-xl font-medium mb-3">{vlog.title}</h3>
-                <div className="aspect-video">
-                  <iframe
-                    className="w-full h-full rounded-lg"
-                    src={vlog.url}
-                    title={vlog.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              </div>
-            ))}
-          </div>
+          {videoUrl && (
+            <div className="aspect-video w-full bg-neutral-100 rounded-lg overflow-hidden">
+              <video 
+                controls 
+                className="w-full h-full"
+                src={videoUrl}
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
         </section>
 
         <section className="gallery-section">
           <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
-          <div id="gallary-carousel" className="keen-slider flex">
-            {galleryImages.map((image) => (
+          <div id="gallary-carousel" className="flex items-center justify-center gap-4 flex-wrap">
+            {galleryImages.map((image:any) => (
               <div key={image.id} className="keen-slider__slide">
                 <img 
                   src={image.src} 
-                  alt={image.alt} 
+                  alt={""} 
                   className="rounded-lg w-full h-auto"
                 />
               </div>
             ))}
-          </div>
-          <div className="gallary-dots-header flex justify-center mt-4 space-x-2">
-            {/* Dots will be inserted here by the addDots function */}
           </div>
         </section>
       </div>
@@ -100,5 +121,4 @@ const TripSummary: React.FC = () => {
 };
 
 export default TripSummary;
-
 
