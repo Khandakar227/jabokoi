@@ -7,7 +7,7 @@ import { getTouristSpots } from "@/lib/utils";
 
 
 interface TripProp extends ITrip {
-  id: string
+  _id: string
 }
 
 const MyPage = () => {
@@ -47,17 +47,17 @@ const MyPage = () => {
   }, []);
 
   const router = useRouter(); 
+  
   const handleCardClick = (trip: TripProp) => {
-    
-
+      router.push(`/trip/${trip._id}`);
   };
 
   // Create carousel items dynamically
   const carouselItems = trips?.map((trip) => (
     <Card
-      key={trip.id} // Use a unique key for each card
+      key={trip._id} // Use a unique key for each card
       card={{
-        category: trip.id,
+        category: "",
         src: trip?.cover_photo,
         title: `${trip.source} to ${trip.destination}`, // Dynamic title based on trip info
         content: <p>{trip.blog || "No description available"}</p>, // Assuming there's a blog field for content
