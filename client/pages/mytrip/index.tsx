@@ -1,64 +1,23 @@
 import React, { useState, useEffect } from "react";
 import KeenSlider, { KeenSliderInstance } from "keen-slider";
 import { Button } from "@/components/ui/button";
-
-const gallaryArrowsInit = (slider: KeenSliderInstance) => {
-  const leftArrow = document.getElementById("gallary-left-arrow");
-  const rightArrow = document.getElementById("gallary-right-arrow");
-
-  if (leftArrow) leftArrow.addEventListener("click", () => slider.prev());
-  if (rightArrow) rightArrow.addEventListener("click", () => slider.next());
-};
-
-const addDots = (slider: KeenSliderInstance, wrapperSelector: string) => {
-  const dots = document.createElement("div");
-  dots.className = "dots";
-  const wrapper = document.querySelector(wrapperSelector);
-
-  if (wrapper) {
-    while (wrapper.firstChild) {
-      wrapper.removeChild(wrapper.firstChild);
-    }
-
-    slider.track.details.slides.forEach((_e, idx) => {
-      const dot = document.createElement("div");
-      dot.className = "dot";
-      if (idx === 0) dot.classList.add("dot--active");
-      dot.addEventListener("click", () => slider.moveToIdx(idx));
-      dots.appendChild(dot);
-    });
-
-    const updateClasses = () => {
-      const slide = slider.track.details.rel;
-      Array.from(dots.children).forEach((dot, idx) => {
-        if (dot instanceof HTMLElement) {
-          idx === slide
-            ? dot.classList.add("dot--active")
-            : dot.classList.remove("dot--active");
-        }
-      });
-    };
-
-    wrapper.appendChild(dots);
-
-    slider.on("created", updateClasses);
-    slider.on("optionsChanged", updateClasses);
-    slider.on("slideChanged", updateClasses);
-  }
-};
+import { Loader2 } from "lucide-react";
+import { VideoGenerator } from "./videoGenerator";
 
 const TripSummary: React.FC = () => {
-  const [vlogs, setVlogs] = useState<Array<{ id: number; title: string; url: string }>>([]);
+  const [generatingVideo, setGeneratingVideo] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
 
   const galleryImages = [
     {
       id: 1,
-      src: "https://via.placeholder.com/600x400?text=Image+1",
+      src: "/icons/agun.jpg",
       alt: "Trip Image 1",
     },
     {
       id: 2,
-      src: "https://via.placeholder.com/600x400?text=Image+2",
+      src: "/icons/ice.jpeg",
       alt: "Trip Image 2",
     },
     {
@@ -76,17 +35,35 @@ const TripSummary: React.FC = () => {
       slides: { perView: "auto", spacing: 16 },
     });
 
-    gallaryArrowsInit(gallaryCarousel);
-    addDots(gallaryCarousel, ".gallary-dots-header");
+    return () => {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+    };
   }, []);
 
-  const handleGenerateVlog = () => {
-    const newVlog = {
-      id: vlogs.length + 1,
-      title: `Vlog ${vlogs.length + 1}`,
-      url: `https://www.youtube.com/embed/your_dummy_video_url${vlogs.length + 1}`,
-    };
-    setVlogs([...vlogs, newVlog]);
+  const handleGenerateVlog = async () => {
+    setGeneratingVideo(true);
+    setGenerationProgress(0);
+  
+    try {
+      const videoGenerator = new VideoGenerator(1280, 720); // 16:9 aspect ratio
+      const imageSources = galleryImages.map(img => img.src);
+      
+      await videoGenerator.prepareFrames(imageSources, 4); // 4 seconds per image
+      
+      const videoBlob = await videoGenerator.generateVideo((progress) => {
+        setGenerationProgress(progress);
+      });
+  
+      const url = URL.createObjectURL(videoBlob);
+      setVideoUrl(url);
+    } catch (error) {
+      console.error('Error generating video:', error);
+      // Handle error appropriately
+    } finally {
+      setGeneratingVideo(false);
+    }
   };
 
   return (
@@ -106,37 +83,39 @@ const TripSummary: React.FC = () => {
       <div className="space-y-12">
         <section className="vlog-section">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Vlogs</h2>
+            <h2 className="text-2xl font-semibold">Trip Vlog</h2>
             <Button 
               onClick={handleGenerateVlog}
+              disabled={generatingVideo}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Generate Vlog
+              {generatingVideo ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating ({Math.round(generationProgress * 100)}%)
+                </>
+              ) : (
+                'Generate Vlog'
+              )}
             </Button>
           </div>
           
-          <div className="grid gap-6 md:grid-cols-2">
-            {vlogs.map((vlog) => (
-              <div key={vlog.id} className="vlog-item bg-neutral-100 rounded-lg p-4">
-                <h3 className="text-xl font-medium mb-3">{vlog.title}</h3>
-                <div className="aspect-video">
-                  <iframe
-                    className="w-full h-full rounded-lg"
-                    src={vlog.url}
-                    title={vlog.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              </div>
-            ))}
-          </div>
+          {videoUrl && (
+            <div className="aspect-video w-full bg-neutral-100 rounded-lg overflow-hidden">
+              <video 
+                controls 
+                className="w-full h-full"
+                src={videoUrl}
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
         </section>
 
         <section className="gallery-section">
           <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
-          <div id="gallary-carousel" className="keen-slider flex">
+          <div id="gallary-carousel" className="keen-slider">
             {galleryImages.map((image) => (
               <div key={image.id} className="keen-slider__slide">
                 <img 
@@ -147,30 +126,8 @@ const TripSummary: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="gallary-dots-header flex justify-center mt-4 space-x-2">
-            {/* Dots will be inserted here by the addDots function */}
-          </div>
         </section>
       </div>
-
-      <style jsx>{`
-        .dot {
-          width: 10px;
-          height: 10px;
-          background: #c5c5c5;
-          border-radius: 50%;
-          cursor: pointer;
-          margin: 0 5px;
-        }
-        .dot--active {
-          background: #000;
-        }
-        .keen-slider__slide {
-          min-width: 100%;
-          max-width: 100%;
-          padding: 0 8px;
-        }
-      `}</style>
     </div>
   );
 };
