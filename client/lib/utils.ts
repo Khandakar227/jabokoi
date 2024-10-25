@@ -128,18 +128,47 @@ export const getNearbyHotels = async (lat: string, long: string, arrival_date: s
 }
 
 
-export const getLatLong = async (locationName:string, API_KEY:string) => {
+export const getLatLong = async (locationName: string, API_KEY: string) => {
   const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(locationName)}&key=${API_KEY}`;
 
   try {
     const response = await fetch(geocodeUrl);
     const data = await response.json();
+    console.log(data);
     const location = data.results[0].geometry.location;
     console.log('Latitude:', location.lat);
     console.log('Longitude:', location.lng);
-    
+
     return location; // {lat: ..., lng: ...}
   } catch (error) {
     console.error('Error fetching coordinates:', error);
   }
 };
+
+export const getTouristSpots = async (locationName: string, API_KEY: string) => {
+  try {
+    let image = "";
+    const radius = 1000; // Search within 1000 meters
+    const location = await getLatLong(locationName, API_KEY);
+    const placesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.lat},${location.lng}&radius=${radius}&type=tourist_attraction&key=${API_KEY}`;
+
+    const placesResponse = await fetch(placesUrl);
+    const data = await placesResponse.json();
+    const places = data.results;
+
+    places.forEach((place: any) => {
+      console.log(`Place: ${place.name}`);
+
+      // If place has photos
+      if (place.photos && place.photos.length > 0) {
+        const photoReference = place.photos[0].photo_reference;
+        const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photoreference=${photoReference}&key=${API_KEY}`;
+        image = photoUrl;
+      }
+    });
+    return image;
+  } catch (error) {
+    console.error('Error fetching tourist spots:', error);
+  }
+};
+

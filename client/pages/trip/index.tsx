@@ -3,10 +3,15 @@ import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
 import { useState, useEffect } from "react";
 import { ITrip } from "@/lib/models/trip"; // Import your Trip type
 import { useRouter } from "next/router";
+import { getTouristSpots } from "@/lib/utils";
 
+
+interface TripProp extends ITrip {
+  id: string
+}
 
 const MyPage = () => {
-  const [trips, setTrips] = useState<ITrip[]>([]); // State to hold trips data
+  const [trips, setTrips] = useState<TripProp[]>([]); // State to hold trips data
   const [loading, setLoading] = useState<boolean>(true); // Loading state
 
   useEffect(() => {
@@ -17,7 +22,20 @@ const MyPage = () => {
           throw new Error("Network response was not ok");
         }
         const data: ITrip[] = await response.json(); // Assuming the response is an array of Trip objects
-        setTrips(data);
+        setTrips(data as any);
+        data.forEach(async (d) => {
+        await fetch(`/api/image?locationName=${d.destination}`)
+        .then(res => res.json())
+        .then(data => {
+          setTrips( ts => ts.map((t) => {
+            if(t.destination == d.destination) t.cover_photo = data.image;
+            return t;
+          }));
+        }).catch(err => {
+          console.log(err);
+        });
+      });
+
       } catch (error) {
         console.error("Error fetching trips:", error);
       } finally {
@@ -29,19 +47,18 @@ const MyPage = () => {
   }, []);
 
   const router = useRouter(); 
-  const handleCardClick = (trip: ITrip) => {
-    console.log(`Clicked on trip: ${trip.id}`);
-    router.push(`/trip/${trip.id}`);
+  const handleCardClick = (trip: TripProp) => {
+    
 
-    // Add navigation or modal logic here
   };
+
   // Create carousel items dynamically
   const carouselItems = trips?.map((trip) => (
     <Card
       key={trip.id} // Use a unique key for each card
       card={{
-        // src: trip.cover_photo, // Assuming each trip has a cover_photo field
-        src:"",
+        category: trip.id,
+        src: trip?.cover_photo,
         title: `${trip.source} to ${trip.destination}`, // Dynamic title based on trip info
         content: <p>{trip.blog || "No description available"}</p>, // Assuming there's a blog field for content
         
