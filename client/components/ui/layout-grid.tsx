@@ -6,6 +6,8 @@ import Image from "next/image";
 import { div } from "framer-motion/client";
 import { imageServer } from "@/lib/const";
 import Spinner from "../common/Spinner";
+import { useRouter } from "next/router";
+import { useUser } from "@/hooks/use-user";
 
 type Card = {
   id: number;
@@ -22,6 +24,9 @@ const LayoutGrid = ({ cards }: { cards: Card[] }) => {
   const [_cards, setCards] = useState(cards);
   const fileUploadRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  
+  const router = useRouter();
+  const [user, _] = useUser();
 
   useEffect(() => {
     setCards(cards);
@@ -46,10 +51,10 @@ const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     
     setLoading(true);
 
-    if (!file) return;
+    if (!file || !user?._id || !router.query.trip_id) return;
     const form = new FormData();
-    form.append("user_id", "671a2e6ddbc951827deda3ff");
-    form.append("album_id", "671a2e6ddbc");
+    form.append("user_id", user?._id as string);
+    form.append("album_id", router.query.trip_id as string);
     form.append("image", file);
     fetch(imageServer + "/add_image", {
       method: "POST",
@@ -59,7 +64,7 @@ const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     .then(res => {
       setCards(cs => {
         cs.push({
-          id: cs.length,
+          id: cs.length + 1,
           content: "",
           className: "",
           thumbnail: imageServer + "/" + res.image_path,
@@ -69,10 +74,10 @@ const LayoutGrid = ({ cards }: { cards: Card[] }) => {
       }).finally(() => {
       setLoading(false);
     });
-
   }
+  
   return (
-    <div className="w-full h-full p-10 grid grid-cols-1 md:grid-cols-3  max-w-7xl mx-auto gap-4 relative">
+    <div className="w-full p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4 relative min-h-[100vh]">
       {_cards?.map((card, i) => (
         !card.type ?
         <div key={i} className={cn(card.className, "")}>
@@ -96,7 +101,7 @@ const LayoutGrid = ({ cards }: { cards: Card[] }) => {
         :
         <div key={i} className={cn(card.className, "")}>
           <div onClick={handleFileUpload} className={cn(
-                card.className, "relative overflow-hidden bg-blue-500 rounded-xl h-full w-full flex justify-center items-center cursor-pointer"
+                card.className, "relative overflow-hidden bg-blue-500 rounded-xl h-full w-full flex justify-center items-center cursor-pointer min-h-[300px]"
               )}>
                 {
                   loading ? <Spinner/> : <div className="text-white text-2xl">+</div>
@@ -105,10 +110,11 @@ const LayoutGrid = ({ cards }: { cards: Card[] }) => {
           <input type="file" name="image" id="image" className="hidden" ref={fileUploadRef} onChange={onFileUpload} />
         </div>
       ))}
+
       <motion.div
         onClick={handleOutsideClick}
         className={cn(
-          "absolute h-full w-full left-0 top-0 bg-black opacity-0 z-10",
+          "absolute h-full w-full left-0 top-0 bg-black opacity-0 z-10 py-12",
           selected?.id ? "pointer-events-auto" : "pointer-events-none"
         )}
         animate={{ opacity: selected?.id ? 0.3 : 0 }}
@@ -125,7 +131,7 @@ const ImageComponent = ({ card }: { card: Card }) => {
       height="500"
       width="500"
       className={cn(
-        "object-top absolute inset-0 h-full w-full transition duration-200"
+        "object-cover absolute inset-0 h-full w-full transition duration-200"
       )}
       alt="thumbnail"
     />
@@ -142,7 +148,7 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
         animate={{
           opacity: 0.6,
         }}
-        className="absolute inset-0 h-full w-full bg-black opacity-60 z-10"
+        className="absolute inset-0 h-full w-full z-10"
       />
       <motion.div
         layoutId={`content-${selected?.id}`}

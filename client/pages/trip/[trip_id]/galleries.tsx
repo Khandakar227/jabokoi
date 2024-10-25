@@ -1,14 +1,18 @@
 import Layout from "@/components/common/Layout";
 import LayoutGrid from "@/components/ui/layout-grid";
+import { useUser } from "@/hooks/use-user";
 import { imageServer } from "@/lib/const";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function galleries() {
     const [cards, setCards] = useState([]);
+    const [user, _] = useUser();
+    const router = useRouter();
+
     useEffect(() => {
-        const user_id = '671a2e6ddbc951827deda3ff';
-        const album_id = '671a2e6ddbc';
-        fetch(`${imageServer}/images?user_id=${user_id}&album_id=${album_id}`)
+        if(!user?._id || !router.query?.trip_id) return;
+        fetch(`${imageServer}/images?user_id=${user?._id}&album_id=${router.query?.trip_id}`)
         .then(res => res.json())
         .then(data => {
             setCards(cs => {
@@ -24,7 +28,7 @@ export default function galleries() {
         }).catch(err => {
             console.log(err);
         });
-    }, []);
+    }, [router.query?.trip_id, user?._id]);
 
   return (
     <Layout>

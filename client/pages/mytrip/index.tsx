@@ -105,7 +105,7 @@ const TripSummary: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
           <div id="gallary-carousel" className="flex items-center justify-center gap-4 flex-wrap">
             {galleryImages.map((image:any) => (
-              <div key={image.id} className="keen-slider__slide">
+              <div key={image.id} className="max-w-80">
                 <img 
                   src={image.src} 
                   alt={""} 

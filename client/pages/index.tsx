@@ -285,31 +285,25 @@ export default function Home() {
                     /> {weather.weather[0].description}
                 </div>
 
-                <div className = "flex items-center">
-                  {/* <img
-                    src= "/icons/thermometer-sun.svg"
-                    alt={weather.main.temp}
-                    width="50"
-                    height="50"
-                  /> */}
+                <div className = "flex items-center pb-1 gap-2">
                   <ThermometerSun/>
-                  {weather.main.temp} °C
+                  <b>{weather.main.temp} °C</b>
                 </div>
 
 
-                <div className = "flex items-center">
+                <div className = "flex items-center pb-1 gap-2">
                   <ThermometerSnowflake/>
-                  {weather.main.feels_like} °C
+                  <b>{weather.main.feels_like} °C</b>
                 </div>
 
-                <div className = "flex items-center">
+                <div className = "flex items-center pb-1 gap-2">
                   <CloudRainWind/>
-                  {weather.main.humidity}%
+                  <b>{weather.main.humidity}%</b>
                 </div>
 
-                <div className = "flex items-center space-between">
+                <div className = "flex items-center space-between gap-2">
                   <Wind/>
-                  {weather.wind.speed} m/s 
+                  <b>{weather.wind.speed} m/s</b> 
                 </div>
 
               </div>

@@ -31,6 +31,7 @@ export async function login(email: string, password: string) {
     throw Error("Invalid email or password.");
   if (checkPasswordMatch(password, user.password)) {
     const userInfo = {
+      _id: user._id,
       name: user.name,
       email: user.email,
       isVerified: user.isVerified,

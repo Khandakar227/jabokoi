@@ -1,4 +1,4 @@
-import { Bus, Home, TicketsPlane, Hotel, Backpack, LogIn, MemoryStick } from "lucide-react"
+import { Bus, Home, TicketsPlane, Hotel, Backpack, LogIn, MemoryStick, User } from "lucide-react"
 
 import {
   Sidebar,
@@ -11,6 +11,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { useUser } from "@/hooks/use-user"
+import { Button } from "../ui/button"
 
 // Menu items.
 const items = [
@@ -25,23 +27,29 @@ const items = [
     icon: Bus,
   },
   {
-    title: "Travel Blogs",
-    url: "#",
-    icon: Backpack,
-  },
-  {
     title: "Memories",
     url: "/memories",
     icon: MemoryStick,
   },
-  {
-    title: "Login",
-    url: "/login",
-    icon: LogIn,
-  },
+  // {
+  //   title: "Login",
+  //   url: "/login",
+  //   icon: LogIn,
+  // },
 ]
 
 export function AppSidebar() {
+  const [user, setUser] = useUser();
+
+  function logout() {
+    const shouldLogout = confirm("Are you sure you want to log out?");
+    
+    if(!shouldLogout) return; 
+
+    localStorage.removeItem("token");
+    setUser(null);
+  }
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -59,6 +67,27 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {
+                user ? (
+                  <SidebarMenuItem key={"User"}>
+                      <SidebarMenuButton asChild className="p-4">
+                        <Button onClick={logout}>
+                          < User/>
+                          <span className="font-semibold p-4">{"Log out"}</span>
+                        </Button>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ) : (
+              <SidebarMenuItem key={"Login"}>
+                  <SidebarMenuButton asChild className="p-4">
+                    <Link href={"/login"}>
+                      < LogIn/>
+                      <span className="font-semibold p-4">{"Login"}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                )
+              }
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

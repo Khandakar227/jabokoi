@@ -1,1 +1,1 @@
-export const imageServer = 'http://172.28.30.248:5000';
+export const imageServer = 'http://192.168.246.228:5000';

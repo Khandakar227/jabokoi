@@ -8,7 +8,6 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 
 const user_id = '671a2e6ddbc951827deda3ff';
-const album_id = '671a2e6ddbc';
 
 function Memories() {
     const [loading, setLoading] = useState(false);
@@ -26,7 +25,6 @@ function Memories() {
             },
             body: JSON.stringify({
                 user_id,
-                album_id,
                 description
             })
         })
