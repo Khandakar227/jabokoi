@@ -56,6 +56,7 @@ const Trip = () => {
           return cs;
         });
       })
+      .catch(err => console.log(err))
       .finally(() => {
         setLoading(false);
       });

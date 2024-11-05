@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Layout from "@/components/common/Layout";
 import { Boxes } from "@/components/common/BackgroundBox";
+import Markdown from "react-markdown";
 import {
   cn,
   formatDate,
@@ -336,7 +337,7 @@ export default function Home() {
                 itineraryText && (
                 <div className="py-12">
                   <h1 className="text-2xl font-bold">Travel Itinerary</h1>
-                  <div className="whitespace-pre-wrap py-6">{itineraryText}</div>
+                  <div className="whitespace-pre-wrap py-6"><Markdown>{itineraryText}</Markdown></div>
                 </div>
                   )
               }
